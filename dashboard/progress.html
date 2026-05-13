@@ -37,17 +37,82 @@
 Above the v3.0.6 published baseline (~0.71 pyco / 0.865 ultralytics) and the
 2026 DINOv3+YOLO26 in-domain published result (0.723 pyco).</p>
 
-<h2>Canonical mAP history (pycocotools)</h2>
-<table><thead><tr><th>Model / run</th><th>mAP50-95</th><th>mAP50</th></tr></thead>
-<tbody><tr><td>v3_0_29</td><td>0.7446</td><td>0.9321</td></tr></tbody></table>
+<h2>Results — full context for every mAP number</h2>
+<style>
+.result-card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem;
+                margin-bottom: 1.5rem; background: #fff; }
+.result-head { font-size: 1.1rem; padding-bottom: 0.6rem;
+                border-bottom: 1px solid #eee; margin-bottom: 0.8rem; }
+.result-head .result-label { font-weight: 600; color: #2a7; margin-right: 0.8rem; }
+.result-head .result-mainmap { background: #f3f9f5; padding: 0.2rem 0.5rem;
+                                 border-radius: 4px; }
+.result-row { display: grid; grid-template-columns: 1fr 1fr 1fr;
+               gap: 1rem; margin-bottom: 0.6rem; }
+.result-col h4 { margin: 0.2rem 0 0.4rem 0; font-size: 0.95rem; color: #555; }
+.result-col table { font-size: 0.85rem; }
+.result-col td:first-child { color: #777; padding-right: 0.6rem; }
+.result-col td:last-child  { text-align: right; font-family: monospace; }
+.pc-table { margin: 0.5rem 0; font-size: 0.85rem; }
+.pc-table th { background: #f5f5f5; padding: 0.2rem 0.6rem; }
+.notes { color: #888; padding-top: 0.5rem; border-top: 1px solid #eee;
+          margin-top: 0.6rem; }
+details summary { cursor: pointer; padding: 0.3rem 0; color: #666;
+                   font-size: 0.9rem; }
+</style>
+
+<div class="result-card">
+  <div class="result-head">
+    <span class="result-label">v3.0.29 SAFETY (yolo26x cwd12-only)</span>
+    <span class="result-mainmap">mAP50-95 = <b>0.7446</b></span>
+    <span class="small">(gap to 0.90: +0.1554)</span>
+  </div>
+  <div class="result-row">
+    <div class="result-col">
+      <h4>Result (pycocotools canonical)</h4>
+      <table>
+        <tr><td>mAP50-95</td><td><b>0.7446</b></td></tr>
+        <tr><td>mAP50</td><td>0.9321</td></tr>
+        <tr><td>mAP75</td><td>0.8878</td></tr>
+        <tr><td>val images</td><td>1977</td></tr>
+        <tr><td>val annotations</td><td>3257</td></tr>
+        <tr><td>predictions made</td><td>17434</td></tr>
+      </table>
+    </div>
+    <div class="result-col">
+      <h4>Training data</h4>
+      <table>
+        <tr><td>source</td><td>cwd12 train portion only (stem-filtered, 0 leak)</td></tr>
+        <tr><td># slugs used</td><td><b>1</b></td></tr>
+        <tr><td># training imgs</td><td><b>3,671</b></td></tr>
+        <tr><td># classes</td><td>12</td></tr>
+        <tr><td>uses Brain-harvested?</td><td>no</td></tr>
+        <tr><td>uses autolabel?</td><td>no</td></tr>
+      </table>
+    </div>
+    <div class="result-col">
+      <h4>Run config</h4>
+      <table>
+        <tr><td>model</td><td>yolo26x.pt (COCO pretrained)</td></tr>
+        <tr><td>epochs</td><td>62 / 200</td></tr>
+        <tr><td>imgsz</td><td>1024</td></tr>
+        <tr><td>batch</td><td>8</td></tr>
+        <tr><td>lr0</td><td>0.001</td></tr>
+        <tr><td>SLURM job</td><td>40612856</td></tr>
+        <tr><td>exit</td><td class="small">TIMEOUT at 12h walltime</td></tr>
+      </table>
+    </div>
+  </div>
+  <details><summary>per-class breakdown</summary><table class="pc-table"><thead><tr><th>class</th><th>AP50-95</th><th>AP50</th><th>n_gt</th></tr></thead><tbody><tr><td>Carpetweeds</td><td>0.785</td><td>0.964</td><td>688</td></tr><tr><td>Crabgrass</td><td>0.799</td><td>0.958</td><td>456</td></tr><tr><td>PalmerAmaranth</td><td>0.758</td><td>0.956</td><td>278</td></tr><tr><td>PricklySida</td><td>0.773</td><td>0.967</td><td>180</td></tr><tr><td>Purslane</td><td>0.840</td><td>0.950</td><td>109</td></tr><tr><td>Ragweed</td><td>0.804</td><td>0.988</td><td>91</td></tr><tr><td>Sicklepod</td><td>0.711</td><td>0.921</td><td>76</td></tr><tr><td>SpottedSpurge</td><td>0.790</td><td>0.957</td><td>42</td></tr><tr><td>Eclipta</td><td>0.698</td><td>0.890</td><td>353</td></tr><tr><td>Goosegrass</td><td>0.636</td><td>0.859</td><td>320</td></tr><tr><td>Morningglory</td><td>0.627</td><td>0.837</td><td>349</td></tr><tr><td>Nutsedge</td><td>0.716</td><td>0.939</td><td>315</td></tr></tbody></table></details>
+  <div class="small notes">Baseline &#x27;safety net&#x27; run after v3.0.27 contamination retraction. Trains on cwd12 train alone (no Brain-harvested data) to get a clean baseline. v3.0.6 published baseline on same task was 0.865 ultralytics (~0.71 pyco).</div>
+</div>
 
 <h2>Job-D continuous harvest runs</h2>
 <p><span class="small">Each row is one 48h Job-D iteration. "new_slugs" is how many
 NEW dataset slugs Brain discovered in that window. Goal: never-ending growth.</span></p>
 <table><thead><tr><th>SLURM job</th><th>iters</th><th>new_slugs</th><th>elapsed</th><th>exhausted</th></tr></thead>
-<tbody></tbody></table>
+<tbody><tr><td colspan="5" class="small">no Job-D runs logged yet</td></tr></tbody></table>
 
-<footer>Generated 2026-05-12 04:27 UTC ·
+<footer>Generated 2026-05-13 00:25 UTC ·
   cwd12 holdout test set (1,977 hand-labeled imgs) is the NEVER_TRAIN evaluation reference ·
   <a href="https://github.com/greatroboticslab/agentAI">repo</a></footer>
 </body></html>

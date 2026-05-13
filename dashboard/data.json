@@ -3225,5 +3225,166 @@
    ]
   }
  },
- "generated_at": "2026-05-12T04:27:27.354158+00:00"
+ "result_metas": [
+  {
+   "label": "v3.0.29 SAFETY (yolo26x cwd12-only)",
+   "research_version": "v3.0.29",
+   "model_arch": "yolo26x.pt (COCO pretrained)",
+   "training_data": {
+    "primary_source": "cwd12 train portion only (stem-filtered, 0 leak)",
+    "n_slugs_used": 1,
+    "n_images_train": 3671,
+    "n_classes": 12,
+    "class_names": [
+     "Carpetweeds",
+     "Crabgrass",
+     "PalmerAmaranth",
+     "PricklySida",
+     "Purslane",
+     "Ragweed",
+     "Sicklepod",
+     "SpottedSpurge",
+     "Eclipta",
+     "Goosegrass",
+     "Morningglory",
+     "Nutsedge"
+    ],
+    "include_autolabel": false,
+    "uses_brain_harvested": false
+   },
+   "validation_data": {
+    "source": "cwd12 test (848) + valid (1129) = 1977 NEVER_TRAIN holdout",
+    "n_images": 1977,
+    "n_annotations": 3257
+   },
+   "run_config": {
+    "epochs_planned": 200,
+    "epochs_completed": 62,
+    "exit_reason": "TIMEOUT at 12h walltime",
+    "imgsz": 1024,
+    "batch": 8,
+    "lr0": 0.001,
+    "lr_final": 0.01,
+    "patience": 40,
+    "optimizer": "auto (SGD-like)",
+    "augmentation": {
+     "mosaic": 1.0,
+     "mixup": 0.1,
+     "close_mosaic": 15,
+     "hsv_h": 0.015,
+     "hsv_s": 0.7,
+     "hsv_v": 0.4,
+     "degrees": 10.0,
+     "translate": 0.1,
+     "scale": 0.5,
+     "fliplr": 0.5
+    },
+    "slurm_job_id": "40612856",
+    "wallclock_h": 12.0
+   },
+   "notes": "Baseline 'safety net' run after v3.0.27 contamination retraction. Trains on cwd12 train alone (no Brain-harvested data) to get a clean baseline. v3.0.6 published baseline on same task was 0.865 ultralytics (~0.71 pyco).",
+   "summary": {
+    "weights": "results/framework/mega_iterv3_0_28_safety/runs/safety/weights/best.pt",
+    "imgsz": 1024,
+    "n_images": 1977,
+    "n_annotations": 3257,
+    "n_predictions": 17434,
+    "mAP50_95": 0.7446400719001353,
+    "mAP50": 0.9320928673566515,
+    "mAP75": 0.8877980201427559,
+    "mAR_max1": 0.6387441775104026,
+    "mAR_max10": 0.8035834012260371,
+    "mAR_max100": 0.8081940064538513,
+    "all_stats": [
+     0.7446400719001353,
+     0.9320928673566515,
+     0.8877980201427559,
+     -1.0,
+     0.7767326732673265,
+     0.7446851013684873,
+     0.6387441775104026,
+     0.8035834012260371,
+     0.8081940064538513,
+     -1.0,
+     0.95,
+     0.8080925088306159
+    ]
+   },
+   "per_class_AP": {
+    "Carpetweeds": {
+     "AP50_95": 0.7850398655726867,
+     "AP50": 0.9639556285117578,
+     "AP75": 0.934211522236394,
+     "n_gt": 688
+    },
+    "Crabgrass": {
+     "AP50_95": 0.7986609235714981,
+     "AP50": 0.9578439387784018,
+     "AP75": 0.9327626850575835,
+     "n_gt": 456
+    },
+    "PalmerAmaranth": {
+     "AP50_95": 0.7579308349281353,
+     "AP50": 0.9555647760252843,
+     "AP75": 0.933784926718342,
+     "n_gt": 278
+    },
+    "PricklySida": {
+     "AP50_95": 0.7732451614628162,
+     "AP50": 0.9670969424816308,
+     "AP75": 0.9419895188692184,
+     "n_gt": 180
+    },
+    "Purslane": {
+     "AP50_95": 0.8401752592406692,
+     "AP50": 0.9495003558793693,
+     "AP75": 0.9472213598226634,
+     "n_gt": 109
+    },
+    "Ragweed": {
+     "AP50_95": 0.8040872896918426,
+     "AP50": 0.9881724436179883,
+     "AP75": 0.9881724436179883,
+     "n_gt": 91
+    },
+    "Sicklepod": {
+     "AP50_95": 0.7105632286562704,
+     "AP50": 0.9214978591098227,
+     "AP75": 0.8853533315872911,
+     "n_gt": 76
+    },
+    "SpottedSpurge": {
+     "AP50_95": 0.7896584141928936,
+     "AP50": 0.9566412681859561,
+     "AP75": 0.9068547117340136,
+     "n_gt": 42
+    },
+    "Eclipta": {
+     "AP50_95": 0.6975201444016904,
+     "AP50": 0.8900490481512419,
+     "AP75": 0.8131498735837304,
+     "n_gt": 353
+    },
+    "Goosegrass": {
+     "AP50_95": 0.6355609256245371,
+     "AP50": 0.8594823473891814,
+     "AP75": 0.7633430582237332,
+     "n_gt": 320
+    },
+    "Morningglory": {
+     "AP50_95": 0.6270601343472296,
+     "AP50": 0.8365855387525254,
+     "AP75": 0.7469074266959053,
+     "n_gt": 349
+    },
+    "Nutsedge": {
+     "AP50_95": 0.7161786811113534,
+     "AP50": 0.9387242613966594,
+     "AP75": 0.8598253835662066,
+     "n_gt": 315
+    }
+   }
+  }
+ ],
+ "generated_at": "2026-05-13T00:25:06.057572+00:00"
 }
