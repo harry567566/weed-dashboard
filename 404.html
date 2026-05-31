@@ -1,0 +1,34 @@
+<!doctype html><html><head><meta charset="utf-8">
+<title>Redirecting to live cluster dashboard…</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{font-family:-apple-system,sans-serif;text-align:center;padding:3rem;color:#444}
+h1{color:#2a7;font-size:1.4rem}
+code{background:#f5f5f5;padding:.2rem .5rem;border-radius:3px;font-size:.9rem;word-break:break-all}
+.spin{display:inline-block;animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.err{color:#c44;background:#fee;padding:1rem;border-radius:6px;margin:1rem auto;max-width:560px;display:none}
+</style></head><body>
+<h1><span class="spin">⟳</span> redirecting to live cluster…</h1>
+<p id="info"></p>
+<div id="err" class="err"></div>
+<script>
+(async function(){
+  try{
+    const r = await fetch('/weed-dashboard/tunnel_url.json?cb='+Date.now(), {cache:'no-store'});
+    if(!r.ok) throw new Error('tunnel_url.json missing');
+    const j = await r.json();
+    if(!j.url) throw new Error('tunnel url empty');
+    let sub = window.location.pathname.replace(/^\/weed-dashboard/,'') || '/';
+    if(sub === '') sub = '/';
+    const dest = j.url + sub + window.location.search + window.location.hash;
+    document.getElementById('info').innerHTML = '→ <code>' + dest + '</code>';
+    window.location.replace(dest);
+  }catch(e){
+    const el = document.getElementById('err');
+    el.style.display = 'block';
+    el.innerHTML = 'Cluster server unreachable: ' + e
+      + '<br><br>Try the <a href="/weed-dashboard/">home page</a>.';
+  }
+})();
+</script></body></html>
