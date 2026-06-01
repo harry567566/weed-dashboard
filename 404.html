@@ -1,34 +1,95 @@
 <!doctype html><html><head><meta charset="utf-8">
-<title>Redirecting to live cluster dashboard…</title>
+<title>Weed-detection dashboard — auth required</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-body{font-family:-apple-system,sans-serif;text-align:center;padding:3rem;color:#444}
-h1{color:#2a7;font-size:1.4rem}
-code{background:#f5f5f5;padding:.2rem .5rem;border-radius:3px;font-size:.9rem;word-break:break-all}
+body{font-family:-apple-system,sans-serif;text-align:center;padding:3rem;color:#444;
+     background:linear-gradient(135deg,#f6f8fb 0%,#e9eef6 100%);min-height:100vh;margin:0}
+.box{background:#fff;max-width:480px;margin:0 auto;padding:2rem;border-radius:12px;
+     box-shadow:0 4px 20px rgba(0,0,0,.08)}
+h1{color:#2a7;font-size:1.4rem;margin:0 0 1rem 0}
 .spin{display:inline-block;animation:spin 1s linear infinite}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.err{color:#c44;background:#fee;padding:1rem;border-radius:6px;margin:1rem auto;max-width:560px;display:none}
+input[type=password]{width:80%;padding:.5rem .8rem;font-size:14px;
+                     border:1px solid #ccc;border-radius:6px;margin:.5rem 0}
+button{background:#2a7;color:#fff;border:0;padding:.5rem 1.2rem;font-size:14px;
+       border-radius:6px;cursor:pointer;margin:.5rem}
+button:hover{background:#229}
+.err{color:#c44;background:#fee;padding:.7rem;border-radius:6px;margin:1rem 0;display:none}
+code{background:#f5f5f5;padding:.1rem .4rem;border-radius:3px;font-size:.85rem;
+     word-break:break-all}
+small{color:#888}
 </style></head><body>
-<h1><span class="spin">⟳</span> redirecting to live cluster…</h1>
-<p id="info"></p>
+<div class="box">
+<h1>🌱 Weed-detection dashboard</h1>
+<p id="info">Enter password to continue:</p>
 <div id="err" class="err"></div>
+<input type="password" id="pw" placeholder="password" autocomplete="current-password">
+<br>
+<button onclick="auth()">▶ enter</button>
+<p><small>5 wrong attempts = 1 hour IP lockout</small></p>
+</div>
 <script>
-(async function(){
-  try{
-    const r = await fetch('/weed-dashboard/tunnel_url.json?cb='+Date.now(), {cache:'no-store'});
-    if(!r.ok) throw new Error('tunnel_url.json missing');
-    const j = await r.json();
+function showErr(m){const e=document.getElementById('err');e.style.display='block';e.textContent=m}
+
+async function auth(){
+  const pw = document.getElementById('pw').value;
+  if(!pw){ showErr('password required'); return }
+
+  // Stash for the redirect — modern browsers accept user:pass@URL only via
+  // setRequestHeader. We can't construct an auth-laden URL safely from JS,
+  // so we cache the credential in sessionStorage and the redirect target
+  // page must read it back. But cross-origin sessionStorage won't survive.
+  //
+  // Pragmatic workaround: do an explicit fetch with Basic auth header to
+  // verify password. If 200, redirect to the bare tunnel URL — the browser
+  // will then prompt natively for Basic auth (one time), and the user
+  // re-enters the same password. The native prompt is sticky for the
+  // session, so they only see it once.
+  try {
+    const r0 = await fetch('/weed-dashboard/tunnel_url.json?cb='+Date.now(), {cache:'no-store'});
+    if(!r0.ok) throw new Error('tunnel_url.json missing');
+    const j = await r0.json();
     if(!j.url) throw new Error('tunnel url empty');
-    let sub = window.location.pathname.replace(/^\/weed-dashboard/,'') || '/';
-    if(sub === '') sub = '/';
-    const dest = j.url + sub + window.location.search + window.location.hash;
-    document.getElementById('info').innerHTML = '→ <code>' + dest + '</code>';
-    window.location.replace(dest);
-  }catch(e){
-    const el = document.getElementById('err');
-    el.style.display = 'block';
-    el.innerHTML = 'Cluster server unreachable: ' + e
-      + '<br><br>Try the <a href="/weed-dashboard/">home page</a>.';
+
+    const test = await fetch(j.url + '/healthz', {
+      headers: {'Authorization': 'Basic ' + btoa('harry:' + pw)},
+      method: 'GET',
+    });
+    if(test.status === 429){
+      const t = await test.json();
+      showErr('Rate-limited: ' + (t.msg || 'too many failed attempts'));
+      return;
+    }
+    // healthz is exempt so it returns 200 always; do a real auth check on /api/state
+    const real = await fetch(j.url + '/api/state', {
+      headers: {'Authorization': 'Basic ' + btoa('harry:' + pw)},
+      method: 'GET',
+    });
+    if(real.status === 200){
+      // Build redirect path preserving subpath/query
+      let sub = window.location.pathname.replace(/^\/weed-dashboard/,'') || '/';
+      if(sub === '') sub = '/';
+      // Construct URL with credentials in the URL — modern Chrome strips
+      // it on navigate, so we use a different trick: open with a fetch+
+      // document.write. Simpler: just redirect; the dashboard server will
+      // ask via WWW-Authenticate and the browser dialog will accept it.
+      window.location.replace(j.url + sub + window.location.search + window.location.hash);
+    } else if(real.status === 401){
+      showErr('Wrong password (or too many tries — wait 1h if locked)');
+    } else if(real.status === 429){
+      const t = await real.json();
+      showErr('Locked: ' + t.msg);
+    } else {
+      showErr('Unexpected status ' + real.status);
+    }
+  } catch(e){
+    showErr('Cluster unreachable: ' + e);
   }
-})();
-</script></body></html>
+}
+
+document.getElementById('pw').addEventListener('keypress', (e)=>{
+  if(e.key === 'Enter') auth();
+});
+document.getElementById('pw').focus();
+</script>
+</body></html>
